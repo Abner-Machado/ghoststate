@@ -1,6 +1,7 @@
 """GhostState must never mutate a real system without explicit approval."""
 
 import os
+import sys
 
 from ghoststate.evidence import Hypothesis
 from ghoststate.experiment import Verdict, propose_experiment, run_experiment
@@ -22,7 +23,7 @@ def test_experiment_does_not_run_without_approval(tmp_path):
     proposal = propose_experiment(_hypothesis())
     result = run_experiment(
         proposal,
-        command=["python3", "-c", f"open({str(marker)!r}, 'w').close()"],
+        command=[sys.executable, "-c", f"open({str(marker)!r}, 'w').close()"],
         approved=False,
     )
     assert result.verdict == Verdict.NOT_RUN
@@ -35,7 +36,7 @@ def test_experiment_only_runs_the_explicitly_supplied_command(tmp_path):
     proposal = propose_experiment(_hypothesis())
     result = run_experiment(
         proposal,
-        command=["python3", "-c", f"open({str(marker)!r}, 'w').close()"],
+        command=[sys.executable, "-c", f"open({str(marker)!r}, 'w').close()"],
         approved=True,
     )
     assert result.ran is True
@@ -44,5 +45,5 @@ def test_experiment_only_runs_the_explicitly_supplied_command(tmp_path):
 
 def test_experiment_env_overrides_do_not_leak_into_the_real_process_env():
     proposal = propose_experiment(_hypothesis(), env_overrides={"GHOSTSTATE_TEST_OVERRIDE": "1"})
-    run_experiment(proposal, command=["python3", "-c", "pass"], approved=True)
+    run_experiment(proposal, command=[sys.executable, "-c", "pass"], approved=True)
     assert "GHOSTSTATE_TEST_OVERRIDE" not in os.environ
