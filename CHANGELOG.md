@@ -5,6 +5,12 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- The experiment safety tests spawned a hard-coded `python3`, which is not on
+  `PATH` on Windows, so three of them failed there. They now use
+  `sys.executable`, the interpreter already running the suite.
+
 ## [0.1.0] - release candidate
 
 Initial MVP. See `docs/ARCHITECTURE.md#roadmap` for what's deliberately not
