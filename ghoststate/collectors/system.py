@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import platform
 import shutil
+import sys
 from typing import Any
 
 
@@ -129,10 +130,13 @@ def _mount_fs_type(path: str) -> str | None:
 
 
 def _resource_limits() -> dict[str, Any] | None:
-    try:
-        import resource
-    except ImportError:
+    # The resource module is POSIX-only. Checking sys.platform (rather than
+    # catching ImportError) lets mypy skip the block on Windows, where the
+    # stubs have no getrlimit/RLIMIT_NOFILE.
+    if sys.platform == "win32":
         return None
+    import resource
+
     try:
         nofile = resource.getrlimit(resource.RLIMIT_NOFILE)
         nproc_limit = None

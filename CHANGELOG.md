@@ -7,6 +7,11 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- `mypy` failed on Windows: the system collector imported the POSIX-only
+  `resource` module inside a `try/except ImportError`, which the type checker
+  cannot see through. It now checks `sys.platform` first, which `mypy`
+  understands, and CI runs the whole pipeline on Windows too (Python 3.9 and
+  3.14) alongside Linux (3.9 through 3.14).
 - The experiment safety tests spawned a hard-coded `python3`, which is not on
   `PATH` on Windows, so three of them failed there. They now use
   `sys.executable`, the interpreter already running the suite.
